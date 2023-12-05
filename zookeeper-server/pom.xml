@@ -374,7 +374,7 @@
                 <param>org.apache.zookeeper.server.DataTree</param>
               </targetClasses>
               <targetTests>
-                <param>org.apache.zookeeper..ZooKeeperTest</param>
+                <param>org.apache.zookeeper.ZooKeeperTest</param>
                 <param>org.apache.zookeeper.server.DataTreeTest</param>
               </targetTests>
               <avoidCallsTo>
@@ -395,7 +395,7 @@
       </build>
     </profile>
 
-    <!-- Badua Profile -->
+    <!-- Stefano Costanzo Badua Profile -->
     <profile>
       <id>BaduaProfile</id>
       <activation>

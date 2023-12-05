@@ -31,6 +31,6 @@ jobs:
       - name: Upload report
         uses: actions/upload-artifact@v3
         with:
-          name: Bookkeeper_Pit_Report
-          path: bookkeeper-server/target/pit-reports
+          name: Zookeeper_Pit_Report
+          path: zookeeper-server/target/pit-reports
           if-no-files-found: error
