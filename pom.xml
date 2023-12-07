@@ -617,8 +617,9 @@
     <!-- Stefano Costanzo -->
     <sonar.organization>stefanousagithub</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-
-    <!-- Stefano Costanzo -->
+    <sonar.projectKey>stefanozookeeper_key</sonar.projectKey>
+    
+        <!-- Stefano Costanzo -->
     <sonar.coverage.jacoco.xmlReportPaths>../tests/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths> 
 
     <!-- Stefano Costanzo -->
