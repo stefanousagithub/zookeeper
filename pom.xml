@@ -536,7 +536,41 @@
         </pluginManagement>
       </build>
     </profile>
+    
+     <!-- JaCoCo profile Stefano Costanzo-->
+    <profile>
+      <id>JacocoProfile</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    
+    
+    
   </profiles>
+
+
+
+
 
   <properties>
     <!-- maven properties -->
@@ -580,6 +614,16 @@
     <c-client-openssl>yes</c-client-openssl>
     <c-client-sasl>yes</c-client-sasl>
 
+    <!-- Stefano Costanzo -->
+    <sonar.organization>stefanousagithub</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+    <!-- Stefano Costanzo -->
+    <sonar.coverage.jacoco.xmlReportPaths>../tests/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths> 
+
+    <!-- Stefano Costanzo -->
+    <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version> 
+    
   </properties>
 
   <dependencyManagement>
