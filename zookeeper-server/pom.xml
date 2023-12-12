@@ -213,7 +213,6 @@
   <build>
     <plugins>
        <!-- isw jacoco Stefano Costanzo -->
-      <!--
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
@@ -227,7 +226,6 @@
             </execution>
         </executions>
       </plugin>
-      -->
        <!-- isw badua Stefano Costanzo -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -512,42 +510,33 @@
 
     <!-- Mutation PIT profile -->
     <profile>
-      <id>mutation</id>
+      <id>PitProfile</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
-      <properties>
-        <withHistory>true</withHistory>
-        <pitest.version>1.8.0</pitest.version>
-      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
-            <version>${pitest.version}</version>
+            <version>1.5.1</version>
             <configuration>
-              <timeoutConstant>6000</timeoutConstant>
               <targetClasses>
-                <param>org.apache.zookeeper.common.PathUtils</param>
+                <param>org.apache.zookeeper.ZooKeeper</param>
                 <param>org.apache.zookeeper.server.DataTree</param>
-                <param>org.apache.zookeeper.ZKUtil</param>
               </targetClasses>
               <targetTests>
-                <param>org.apache.zookeeper.common.pathUtilsTest.ValidatePathTest</param>
-                <param>org.apache.zookeeper.server.dataTreeTest.CreateNodeTest</param>
-                <param>org.apache.zookeeper.server.dataTreeTest.DeleteNodeTest</param>
-                <param>org.apache.zookeeper.zkUtilTest.ListSubTreeBFSTest</param>
+                <param>org.apache.zookeeper.ZooKeeperTest</param>
+                <param>org.apache.zookeeper.server.DataTreeTest</param>
               </targetTests>
-
               <avoidCallsTo>
                 <avoidCallsTo>org.slf4j</avoidCallsTo>
               </avoidCallsTo>
             </configuration>
             <executions>
               <execution>
-                <id>Mutation report</id>
-                <phase>test-compile</phase>
+                <id>PIT Report Generation</id>
+                <phase>test</phase>
                 <goals>
                   <goal>mutationCoverage</goal>
                 </goals>

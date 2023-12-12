@@ -10,7 +10,6 @@ import org.apache.zookeeper.data.Stat;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -21,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.*;
-// dddd
+
 @RunWith(Enclosed.class)
 public class DataTreeTest {
     private static Random random = new Random(System.currentTimeMillis());
