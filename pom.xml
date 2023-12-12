@@ -65,6 +65,7 @@
     <module>zookeeper-recipes</module>
     <module>zookeeper-assembly</module>
     <module>zookeeper-compatibility-tests</module>
+    
   </modules>
 
   <scm>
@@ -561,16 +562,7 @@
         </plugins>
       </build>
     </profile>
-
-
-    
-    
-    
   </profiles>
-
-
-
-
 
   <properties>
     <!-- maven properties -->
@@ -715,7 +707,7 @@
         <groupId>org.jmockit</groupId>
         <artifactId>jmockit</artifactId>
         <version>${jmockit.version}</version>
-      </dependency>
+      </dependency>      
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
@@ -743,6 +735,7 @@
         <artifactId>junit-vintage-engine</artifactId>
         <version>${junit.version}</version>
       </dependency>
+     
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
@@ -873,6 +866,9 @@
           <artifactId>maven-scm-plugin</artifactId>
           <version>1.11.2</version>
         </plugin>
+        
+        <!-- Stefano Costanzo -->
+        <!--
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -881,6 +877,20 @@
               <redirectTestOutputToFile>${redirectTestOutputToFile}</redirectTestOutputToFile>
           </configuration>
         </plugin>
+        -->
+	<!-- Stefano Costanzo -->
+        <plugin>
+	  <groupId>org.apache.maven.plugins</groupId>
+	  <artifactId>maven-surefire-plugin</artifactId>
+	  <version>2.22.0</version>
+        </plugin>
+        <plugin>
+	  <groupId>org.apache.maven.plugins</groupId>
+	  <artifactId>maven-failsafe-plugin</artifactId>
+	  <version>2.22.0</version>
+        </plugin>
+        
+        
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
