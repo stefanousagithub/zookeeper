@@ -245,7 +245,7 @@
               <version>${ba-dua-agent-rt.version}</version>
               <classifier>all</classifier>
               <packaging>jar</packaging>
-              <file>${project.basedir}/../ba-dua/ba-dua-agent-rt-${ba-dua-agent-rt.version}-all.jar</file>
+              <file>${project.basedir}/ba-dua/ba-dua-agent-rt-${ba-dua-agent-rt.version}-all.jar</file>
             </configuration>
           </execution>
           <execution>
@@ -260,7 +260,7 @@
               <version>${ba-dua.version}</version>
               <classifier>all</classifier>
               <packaging>jar</packaging>
-              <file>${project.basedir}/../ba-dua/ba-dua-cli-${ba-dua.version}-all.jar</file>
+              <file>${project.basedir}/ba-dua/ba-dua-cli-${ba-dua.version}-all.jar</file>
             </configuration>
           </execution>
         </executions>
