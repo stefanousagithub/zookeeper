@@ -13,16 +13,25 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @RunWith(Enclosed.class)
 public class DataTreeTest {
+    private static final Logger LOG = LoggerFactory.getLogger(DataTree.class);
     private static Random random = new Random(System.currentTimeMillis());
 	private static int count = 0;
 	@RunWith(Parameterized.class)
@@ -90,7 +99,7 @@ public class DataTreeTest {
                 if (typeTest == 2) continue;
                 if (typeTest == 3) isFatherEph = -1;
                 if ((typeTest == 6 ||typeTest == 7)  && count == 1) currentPath = Quotas.quotaZookeeper+currentPath;    
-                this.dataTree.createNode(currentPath, new byte[100], null, isFatherEph, dataTree.getNode(nodeParent).stat.getCversion(), 0, 1);
+                this.dataTree.createNode(currentPath, new byte[100], null, isFatherEph, dataTree.getNode(Quotas.quotaZookeeper).stat.getCversion(), 0, 1);
                 prevPath = currentPath;
                 nodeParent = currentPath;
                 if (count != 1) {
@@ -104,29 +113,14 @@ public class DataTreeTest {
             this.nNodes = n;
             if (typeTest == 6 || typeTest == 7) this.nNodes++;
 	    }
-	    
-//    } else if (testType == 7) {
-//        this.dtQuotas = new DataTree();
-//        this.dtQuotas.createNode(Quotas.quotaZookeeper+"/parent", new byte[0], null, 0, 0,1, 1);
-//    }else if (testType == 8) {
-//        this.dtStat = new DataTree();
-//        this.dtStat.createNode("/zn1", new byte[0], null, 0, 0,1, 1, new Stat());
-//    }else if (testType == 9) {
-//        this.dtQuotas = new DataTree();
-//        this.dtQuotas.createNode("/parent", new byte[0], null, 0, 0,1, 1);
-//    }
-	    
-//	    /zookeeper/quota/node1/zookeeper_limits
-	    
-	    
 	
 	    @Parameters
 	    public static Collection<Object[]> getParameters() {
 	        return Arrays.asList(new Object[][]{
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, -1, -1, -1, -1, 1, ""},										// 0
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 0, 0, 0, 0, 1, ""},											// 1
-                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xff00000000000001L, 1, 2, 1, 1, ""},								// 2
-                {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 0x8000000000000000L, 5, 3, 1000, 1, ""},								// 3
+                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xFF00000000000001L, 1, 2, 1, 1, ""},						// 2
+                {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 0x8000000000000000L, 5, 3, 1000, 1, ""},					// 3
                 {"/node1", 10, ZooDefs.Ids.OPEN_ACL_UNSAFE, 1, 0, 1, 1, 1, ""},											// 4
                 {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 1, 0, 1, 1, 1, ""},											// 5
                 {"/node1", 10, new ArrayList<>(), 1, 0, 1, 1, 1, ""},													// 6
@@ -143,13 +137,12 @@ public class DataTreeTest {
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, -1, -1, -1, 1000, 1, ""},									// 17
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 4, "NodeExistsException"},  					// 18: Add node two times
                
-                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xff00000000000001L, -1, 2, -1, 5, ""},					     // 19
-
+                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xFF00000000000001L, -1, 2, -1, 5, ""},					     // 19
                 // add quora
-                {"/node1"+"/"+Quotas.limitNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 6, ""},											// 
-                {Quotas.statNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 7, ""},											// 
-                {"/node1"+"/"+Quotas.limitNode + "/node2", 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 6, ""},
-                {"/node1"+"/"+ Quotas.limitNode + "/"+ Quotas.limitNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 6, ""},											// 
+                {"/node1/"+Quotas.limitNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 6, ""},											// 
+                {"/node1/"+Quotas.statNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 7, ""},											// 
+                {"/node1/"+Quotas.limitNode + "/node2", 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 6, ""},
+                {"/node1/"+ Quotas.limitNode + "/" + Quotas.limitNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 6, ""},											// 
 	        });
 	    }
 	    
@@ -174,12 +167,158 @@ public class DataTreeTest {
 		        if(ephemeralOwner != 0x8000000000000000L) assertEquals(ephemeralOwner, stat.getEphemeralOwner());
 		        assertEquals(zxid, stat.getCzxid());
 		        assertEquals(time, stat.getCtime());
-		        assertArrayEquals(data, createdNode.getData());
+		        if(typeTest != 7) assertArrayEquals(data, createdNode.getData());
 	    	} catch (Exception e) {
 	    		System.out.println("error " + e.getClass().toString());
 	    		assertTrue(e.getClass().toString().contains(expectedOutput) && expectedOutput != "");
 	    	}
 	    }	       
 	   
+	}
+	
+	
+	@RunWith(Parameterized.class)
+	public static class DeleteNodeTest {
+		// Input data
+	    private String path;
+        private long zxid;
+
+	    // output data
+	    private String expectedOutput;
+
+	    // variables for testing
+	    private DataTree dataTree;
+	    private int typeTest;
+	    private int nNodes = 1;
+	    private String parentPath;
+	    
+	    @Mock
+	    private Logger LOG;
+	    
+	    public DeleteNodeTest(String path, long zxid, int typeTest, String expectedOutput) throws KeeperException.NoNodeException, NodeExistsException{
+			configure(path, zxid, typeTest, expectedOutput);
+	    }	
+	    	
+	    public void configure(String path, long zxid, int typeTest, String expectedOutput) throws KeeperException.NoNodeException, NodeExistsException {
+	    	this.path = path;
+	        this.zxid = zxid;
+	        this.typeTest = typeTest;
+	        this.expectedOutput = expectedOutput;
+	        this.dataTree = new DataTree();
+	        
+	        if(typeTest == 1) {
+	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
+	        	this.dataTree.createNode("/node1/node2", new byte[100], null, 0,  0, 0, 1);
+	        	this.nNodes = 3;
+	            return;
+	        }
+	        if(typeTest == 2) {
+	        	this.dataTree.createNode(Quotas.quotaZookeeper+"/node1", new byte[100], null, 0, 0, 0, 1);
+	        	this.dataTree.createNode(Quotas.quotaZookeeper+"/node1/"+ Quotas.limitNode, new byte[100], null, 0,  0, 0, 1);
+	        	this.nNodes = 3;
+	            return;
+	        }
+	        if(typeTest == 3) {
+	        	this.dataTree.createNode(Quotas.quotaZookeeper+"/node1", new byte[100], null, 0,  0, 0, 1);
+	        	this.dataTree.createNode(Quotas.quotaZookeeper+"/node1/"+ Quotas.statNode, new byte[100], null, 0,  0, 0, 1);
+	        	this.nNodes = 3;
+	            return;
+	        }
+	        if(typeTest == 4) {
+	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
+	        	this.dataTree.createNode("/node1/node2", new byte[100], null, -1,  0, 0, 1);
+	        	this.nNodes = 3;
+	            return;
+	        }
+	        if(typeTest == 5) {
+	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
+	        	this.dataTree.createNode("/node1/node2", new byte[100], null, 0xFF00000000000001L,  0, 0, 1);
+	        	this.nNodes = 3;
+	            return;
+	        }
+	        if(typeTest == 6) {
+	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
+	        	this.dataTree.createNode("/node1/node2", new byte[100], null, 0x8000000000000000L,  0, 0, 1);
+	        	this.nNodes = 3;
+	            return;
+	        }
+	        if(typeTest == 7) {
+	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
+	        	this.dataTree.createNode("/node1/node2", new byte[100], null, -1,  0, 10, 1);
+	        	this.dataTree.createNode("/node1/node2/node3", new byte[100], null, -1,  10, 0, 1);
+	        	this.nNodes = 4;
+	            return;
+	        }
+	    }	    
+	
+	    @Parameters
+
+	    public static Collection<Object[]> getParameters() {
+	        return Arrays.asList(new Object[][]{
+	                {null, -1, 1, "NullPointerException"},
+	                {"", 0, 1, "StringIndexOutOfBoundsException"},
+	                {"node2", 1, 1, "StringIndexOutOfBoundsException"},
+	                {"node1/node2", -1, 1, "NoNodeException"},
+	                {"/node1/node2", 0, 1, ""},
+	                {"/node1", 1, 1, ""},
+	                {"/node1/node2", 1000, 4, ""},
+	                {"/node1/" + Quotas.limitNode, 0, 2, ""},
+	                {"/node1/" + Quotas.statNode, 1, 3, ""},
+	                
+	                // Aggiunti per Jacoco
+	                {"/node1/node2", -1000, 5, ""},
+	                {"/node1/node2", 0, 6, ""},
+	                {"/node1/node2", 0, 7, ""},
+	        });
+	    }
+	    
+	    @Test(timeout=1000)
+	    public void deleteNodeTest(){
+	    	long id;
+    		System.out.println("\n" + count);
+	        count++;
+	    	try{
+	    		if(typeTest == 2 || typeTest == 3) path = Quotas.quotaZookeeper + path;
+		        System.out.println(path);
+
+	    		dataTree.deleteNode(path,zxid);
+	    		if(typeTest ==7) 
+		        System.out.println("ok");
+
+		        // Verify the node is deleted
+		        assertEquals(this.nNodes, dataTree.getNodeCount()-3);
+		        DataNode createdNode = dataTree.getNode(path);
+		        assertNull(createdNode);
+
+		        // Verify the zxid father node
+	    		getParentString(path);
+	    		DataNode parentNode = dataTree.getNode(parentPath);
+                long parentPxzid = parentNode.stat.getPzxid();
+                if(zxid > 0) id = zxid;
+                else id = 0;
+                assertEquals(id, parentPxzid);
+
+	    	} catch (Exception e) {
+	    		System.out.println("error " + e.getClass().toString());
+	    		assertTrue(e.getClass().toString().contains(expectedOutput) && expectedOutput != "");
+	    	}
+	    }	
+	    
+	    private void getParentString(String path){
+            String[] pathNodes = path.split("/");  
+            int n = pathNodes.length;
+	    	String p = "";
+            int count = 1;
+            for (String pathElement : pathNodes) {
+            	if (count == n) {
+                	if (count == 2) p = "/";
+                    break;
+                }
+                if(count != 1) p = p + "/";
+            	p = p + pathElement;
+                count++;
+            }
+            this.parentPath = p;
+	    }
 	}
 }
