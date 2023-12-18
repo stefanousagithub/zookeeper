@@ -206,7 +206,7 @@ public class DataTreeTest {
 	        this.expectedOutput = expectedOutput;
 	        this.dataTree = new DataTree();
 	        
-	        if(typeTest == 1) {
+	        if(typeTest == 1|| typeTest == 7 || typeTest == 8) {
 	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
 	        	this.dataTree.createNode("/node1/node2", new byte[100], null, 0,  0, 0, 1);
 	        	this.nNodes = 3;
@@ -225,8 +225,8 @@ public class DataTreeTest {
 	            return;
 	        }
 	        if(typeTest == 4) {
-	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
-	        	this.dataTree.createNode("/node1/node2", new byte[100], null, -1,  0, 0, 1);
+	        	this.dataTree.createNode("/node1", new byte[100], null, -1,  0, 0, 1);
+	        	this.dataTree.createNode("/node1/node2", new byte[100], null, 0,  0, 0, 1);
 	        	this.nNodes = 3;
 	            return;
 	        }
@@ -242,33 +242,28 @@ public class DataTreeTest {
 	        	this.nNodes = 3;
 	            return;
 	        }
-	        if(typeTest == 7) {
-	        	this.dataTree.createNode("/node1", new byte[100], null, 0,  0, 0, 1);
-	        	this.dataTree.createNode("/node1/node2", new byte[100], null, -1,  0, 10, 1);
-	        	this.dataTree.createNode("/node1/node2/node3", new byte[100], null, -1,  10, 0, 1);
-	        	this.nNodes = 4;
-	            return;
-	        }
 	    }	    
 	
 	    @Parameters
 
 	    public static Collection<Object[]> getParameters() {
 	        return Arrays.asList(new Object[][]{
-	                {null, -1, 1, "NullPointerException"},
-	                {"", 0, 1, "StringIndexOutOfBoundsException"},
-	                {"node2", 1, 1, "StringIndexOutOfBoundsException"},
-	                {"node1/node2", -1, 1, "NoNodeException"},
-	                {"/node1/node2", 0, 1, ""},
-	                {"/node1", 1, 1, ""},
-	                {"/node1/node2", 1000, 4, ""},
-	                {"/node1/" + Quotas.limitNode, 0, 2, ""},
-	                {"/node1/" + Quotas.statNode, 1, 3, ""},
+	                {null, -1, 1, "NullPointerException"},						// 0: Path null
+	                {"", 0, 1, "StringIndexOutOfBoundsException"},				// 1: Path empty
+	                {"node2", 1, 1, "StringIndexOutOfBoundsException"},			// 2: Path incorrect
+	                {"node1/node2", -1, 1, "NoNodeException"},					// 3: Path incorrect
+	                {"/node2", 1, 1, "NoNodeException"},						// 4: Nodo non esistente
+	                {"/node1/node2", 0, 1, ""},									// 5: Op. eseguita
+	                {"/node1", 1, 1, ""},										// 6: Op. eseguita
+	                {"/node1/node2", 1000, 4, ""},								// 7: Nodo padre effimero. Op. eseguita
+	                {"/node1/" + Quotas.limitNode, 0, 2, ""},					// 8: Nodo Quotas.limitNode. Op. eseguita
+	                {"/node1/" + Quotas.statNode, 1, 3, ""},					// 9: Nodo Quotas.statNode. Op. eseguita
 	                
-	                // Aggiunti per Jacoco
-	                {"/node1/node2", -1000, 5, ""},
-	                {"/node1/node2", 0, 6, ""},
-	                {"/node1/node2", 0, 7, ""},
+	                // Aggiunti per Jacoco: Nodi Quota
+	                {"/node1/node2", -1000, 5, ""},								// 10: Nodo TTL. Op. eseguita
+	                {"/node1/node2", 1000, 6, ""},								// 11: Nodo Container. Op. eseguita
+	                {"/node1/node2", 1000, 7, "NoNodeException"},				// 12: Nodo già eliminato
+	                {"/node1/node2", 1000, 8, "NoNodeException"},				// 13: Nodo padre eliminato in precedenza
 	        });
 	    }
 	    
@@ -279,10 +274,20 @@ public class DataTreeTest {
 	        count++;
 	    	try{
 	    		if(typeTest == 2 || typeTest == 3) path = Quotas.quotaZookeeper + path;
+	    		if(typeTest == 7) {
+	    			dataTree.deleteNode(path,zxid);
+	    			this.nNodes--;
+	    		}
+		    	if(typeTest == 8) {
+		    		getParentString(path);
+		    		dataTree.deleteNode(parentPath,zxid);
+	    			this.nNodes--;
+		    	}
+		    	
+	
 		        System.out.println(path);
 
 	    		dataTree.deleteNode(path,zxid);
-	    		if(typeTest ==7) 
 		        System.out.println("ok");
 
 		        // Verify the node is deleted
