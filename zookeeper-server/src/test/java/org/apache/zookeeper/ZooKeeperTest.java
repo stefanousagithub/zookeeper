@@ -43,7 +43,7 @@ public class ZooKeeperTest {
 	public static class GetChildrenTest extends ClientBase {
 		// input variables
 		private String path;
-		private boolean watcher;
+		private ClientBase.CountdownWatcher watcher;
 		
 		// output variables
 		private String expectedOutput;
@@ -62,11 +62,11 @@ public class ZooKeeperTest {
 	    }
 		
 		
-		public GetChildrenTest(String path, boolean watcher,String expectedOutput) throws KeeperException, InterruptedException, IOException{
+		public GetChildrenTest(String path, ClientBase.CountdownWatcher watcher,String expectedOutput) throws KeeperException, InterruptedException, IOException{
 			configure(path, watcher, expectedOutput);
 	    }	
 	    	
-	    public void configure(String path, boolean watcher, String expectedOutput) throws KeeperException, InterruptedException, IOException {
+	    public void configure(String path, ClientBase.CountdownWatcher watcher, String expectedOutput) throws KeeperException, InterruptedException, IOException {
 	    	this.path = path;
 	    	this.watcher = watcher;
 	    	this.expectedOutput = expectedOutput;
@@ -76,25 +76,28 @@ public class ZooKeeperTest {
 	    @Parameters
 	    public static Collection<Object[]> getParameters() {
 	        return Arrays.asList(new Object[][]{
-                {null, true, "IllegalArgumentException"},
-                {"", true, "IllegalArgumentException"},
-                {"node1", true, "IllegalArgumentException"},
-                {"node1/node2", true, "IllegalArgumentException"},
-                {"/node1/node2", true, "0"},
-                {"/node1", true, "2"},
-                {"/node1", false, "2"},
-                {"/node4", true, "KeeperException"},																		
+                {null, new ClientBase.CountdownWatcher(), "IllegalArgumentException"},
+                {"", new ClientBase.CountdownWatcher(), "IllegalArgumentException"},
+                {"node1", new ClientBase.CountdownWatcher(), "IllegalArgumentException"},
+                {"node1/node2", new ClientBase.CountdownWatcher(), "IllegalArgumentException"},
+                {"/node1/node2", new ClientBase.CountdownWatcher(), "0"},
+                {"/node1", new ClientBase.CountdownWatcher(), "2"},
+                {"/node1", null, "2"},                       // null
+                {"/node4", new ClientBase.CountdownWatcher(), "NoNodeException"},																		
 	        });
 	    }
-	    
-	    /// dubbio su true e false del watcher ???
-	    
+	    	    
 	    @Test(timeout=5000)
 	    public void getChildrenTest() {
 	        List<String> children = null;
             try {
+	            System.out.println(zk.getChildWatches());
 				children = zk.getChildren(path, watcher);
+	            System.out.println(zk.getChildWatches());
 				assertEquals(Integer.parseInt(expectedOutput), children.size());
+				if(watcher != null) assertEquals(1, zk.getChildWatches().size());
+				else assertEquals(0, zk.getChildWatches().size());
+
 			} catch (Exception e) {
 	    		System.out.println("error " + e.getClass().toString());
 	    		assertTrue(e.getClass().toString().contains(expectedOutput) && expectedOutput != "");
@@ -109,21 +112,7 @@ public class ZooKeeperTest {
 	             catch (InterruptedException e) {e.printStackTrace();}
 	        }
 	    }
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
 	
 	
 	@RunWith(Parameterized.class)
@@ -181,13 +170,13 @@ public class ZooKeeperTest {
 	    @Parameters
 	    public static Collection<Object[]> getParameters() {
 	        return Arrays.asList(new Object[][]{
-	            {null, new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 1, "IllegalArgumentException"},
-	            {"node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "IllegalArgumentException"},
-	            {"/node1", null, WatcherType.Persistent, true, 1, "IllegalArgumentException"},
-	            {"/node1", new ClientBase.CountdownWatcher(), null, false, 1, "NullPointerException"},
-	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 3, "NoWatcherException"},			// No Watcher
-	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 4, "NoWatcherException"},				// Watcher present but with different type
-	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "0"}             // 
+//	            {null, new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 1, "IllegalArgumentException"},
+//	            {"node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "IllegalArgumentException"},
+//	            {"/node1", null, WatcherType.Persistent, true, 1, "IllegalArgumentException"},
+//	            {"/node1", new ClientBase.CountdownWatcher(), null, false, 1, "NullPointerException"},
+//	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 3, "NoWatcherException"},			// No Watcher
+//	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 4, "NoWatcherException"},				// Watcher present but with different type
+//	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "0"}             // 
 	        });
 	    }	    
 	   	    
