@@ -37,7 +37,7 @@ import java.util.Set;
  * Test the Zookeeper method "getChildren()"
  */
 @RunWith(Enclosed.class)
-public class ZookeeperTest {
+public class ZooKeeperTest {
 
 	@RunWith(Parameterized.class)
 	public static class GetChildrenTest extends ClientBase {
