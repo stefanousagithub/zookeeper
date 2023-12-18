@@ -91,12 +91,10 @@ public class ZooKeeperTest {
 	    public void getChildrenTest() {
 	        List<String> children = null;
             try {
-	            System.out.println(zk.getDataWatches());
 				children = zk.getChildren(path, watcher);
 				assertEquals(Integer.parseInt(expectedOutput), children.size());
 				if(watcher != null) assertEquals(1, zk.getChildWatches().size());
 				else assertEquals(0, zk.getChildWatches().size());
-				System.out.println(zk.getClientConfig());
 
 			} catch (Exception e) {
 	    		System.out.println("error " + e.getClass().toString());

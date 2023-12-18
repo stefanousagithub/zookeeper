@@ -7,6 +7,7 @@ import org.apache.zookeeper.Quotas;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.data.StatPersisted;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
@@ -49,12 +50,12 @@ public class DataTreeTest {
 	    private String expectedOutput;
 
 	    // variables for testing
-        Stat stat;
+        private Stat stat;
 	    private DataTree dataTree;
-	    String[] pathNodes;
+	    private String[] pathNodes;
 	    private int typeTest;
 	    private int nNodes;
-	
+
 	    public CreateNodeTest(String path, int numData, List<ACL> acl, long ephemeralOwner, int parentCVersion, long zxid, long time, int typeTest, String expectedOutput) throws KeeperException.NoNodeException, KeeperException.NodeExistsException {
 			configure(path, numData, acl, ephemeralOwner, parentCVersion, zxid, time, typeTest, expectedOutput);
 	    }	
@@ -117,9 +118,10 @@ public class DataTreeTest {
 	    @Parameters
 	    public static Collection<Object[]> getParameters() {
 	        return Arrays.asList(new Object[][]{
+	        	//String path, int numData, List<ACL> acl, long ephemeralOwner, int parentCVersion, long zxid, long time, int typeTest
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, -1, -1, -1, -1, 1, ""},										// 0
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 0, 0, 0, 0, 1, ""},											// 1
-                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xFF00000000000001L, 1, 2, 1, 1, ""},						// 2
+                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xff00000000000001L, 1, 1, 1, 1, ""},						// 2
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 0x8000000000000000L, 5, 3, 1000, 1, ""},					// 3
                 {"/node1", 10, ZooDefs.Ids.OPEN_ACL_UNSAFE, 1, 0, 1, 1, 1, ""},											// 4
                 {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 1, 0, 1, 1, 1, ""},											// 5
@@ -127,7 +129,7 @@ public class DataTreeTest {
                 {"/node1", 10, null, 1, 0, 1, 1, 1, ""},																// 7
                 {"/node1", 0, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 1, ""},											// 8
                 {"/node1", -1, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 1, "NullPointerException"},						// 9         
-                {"/node1/node2", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 1, ""},									// 10        
+                {"/node1/node2", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 1, 1, 1000, 1, ""},									// 10        
                 {"node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 1, "StringIndexOutOfBoundsException"},			// 11        
                 {"node1/node2", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 1, "NoNodeException"},						// 12: Father path incorrect        
                 {"/node1/node2", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 2, "NoNodeException"}, 					// 13: Father node is not added 
@@ -137,7 +139,7 @@ public class DataTreeTest {
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, -1, -1, -1, 1000, 1, ""},									// 17
                 {"/node1", 10, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 4, "NodeExistsException"},  					// 18: Add node two times
                
-                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xFF00000000000001L, -1, 2, -1, 5, ""},					     // 19
+                {"/node1", 10, ZooDefs.Ids.READ_ACL_UNSAFE, 0xff00000000000001L, -1, 2, -1, 5, ""},					     // 19
                 // add quora
                 {"/node1/"+Quotas.limitNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 6, ""},											// 
                 {"/node1/"+Quotas.statNode, 1000, ZooDefs.Ids.CREATOR_ALL_ACL, 1, 0, 1, 1, 7, ""},											// 
@@ -151,23 +153,70 @@ public class DataTreeTest {
     		System.out.println("\n" + count);
 	        count++;
 	    	try{
-		    	if(typeTest == 5) stat = new Stat();
+	    		System.out.println("Versione degli antenati (Aversion): " + stat.getAversion());
+	    		System.out.println("Tempo di creazione (Ctime): " + stat.getCtime());
+	    		System.out.println("Versione dei figli (Cversion): " + stat.getCversion());
+	    		System.out.println("Zxid di creazione (Czxid): " + stat.getCzxid());
+	    		System.out.println("Lunghezza dei dati (DataLength): " + stat.getDataLength());
+	    		System.out.println("Owner effimero (EphemeralOwner): " + stat.getEphemeralOwner());
+	    		System.out.println("Tempo di modifica (Mtime): " + stat.getMtime());
+	    		System.out.println("Zxid di modifica (Mzxid): " + stat.getMzxid());
+	    		System.out.println("Numero di figli (NumChildren): " + stat.getNumChildren());
+	    		System.out.println("Zxid del genitore (Pzxid): " + stat.getPzxid());
+	    		System.out.println("Versione dei dati (Version): " + stat.getVersion());
+
+	    		
+		    	if(typeTest == 5) {
+			    	stat.setCversion(0);
+			    	stat.setVersion(100);
+			    	System.out.println("A = " + stat.getVersion());
+		    	}
 		    	if(typeTest == 6 || typeTest == 7) path = Quotas.quotaZookeeper + path;
-	    		dataTree.createNode(path, data, acl, ephemeralOwner, parentCVersion, zxid, time, stat);
 	    		if (typeTest == 4) dataTree.createNode(path, data, acl, ephemeralOwner, parentCVersion, zxid, time, stat);
+	    		dataTree.createNode(path, data, acl, ephemeralOwner, parentCVersion, zxid, time, stat);
+	    		
+	    		// Get State
+	    		String parentPath = getParentString(path);
 		        DataNode createdNode = dataTree.getNode(path);
-		        createdNode.copyStat(stat);
-		        
+		        DataNode parentNode = dataTree.getNode(parentPath);
 		        System.out.println("ok");
+
+		        // Assert NodeState		        
+		        System.out.println("Versione degli antenati (Aversion): " + stat.getAversion());
+		        System.out.println("Tempo di creazione (Ctime): " + stat.getCtime());
+		        System.out.println("Versione dei figli (Cversion): " + stat.getCversion());
+		        System.out.println("Zxid di creazione (Czxid): " + stat.getCzxid());
+		        System.out.println("Lunghezza dei dati (DataLength): " + stat.getDataLength());
+		        System.out.println("Owner effimero (EphemeralOwner): " + stat.getEphemeralOwner());
+		        System.out.println("Tempo di modifica (Mtime): " + stat.getMtime());
+		        System.out.println("Zxid di modifica (Mzxid): " + stat.getMzxid());
+		        System.out.println("Numero di figli (NumChildren): " + stat.getNumChildren());
+		        System.out.println("Zxid del genitore (Pzxid): " + stat.getPzxid());
+		        System.out.println("Versione dei dati (Version): " + stat.getVersion());
+
+		        
+		        
 		        
 		        assertNotNull(createdNode);
 		        assertEquals(this.nNodes, dataTree.getNodeCount()-4);
 		        if(acl!= null) assertEquals(acl, dataTree.getACL(createdNode));
-		        else assertEquals(ZooDefs.Ids.OPEN_ACL_UNSAFE, dataTree.getACL(createdNode));
 		        if(ephemeralOwner != 0x8000000000000000L) assertEquals(ephemeralOwner, stat.getEphemeralOwner());
 		        assertEquals(zxid, stat.getCzxid());
-		        assertEquals(time, stat.getCtime());
-		        if(typeTest != 7) assertArrayEquals(data, createdNode.getData());
+		        assertEquals(time, stat.getCtime());	        
+		        if(typeTest != 7) {
+		        	assertArrayEquals(data, createdNode.getData());
+		        	assertEquals(data.length, stat.getDataLength());
+		        }
+		        
+		        
+		        // Assert parent state
+		        if(parentPath != "/" && typeTest == 1) {
+			        assertEquals(1, parentNode.stat.getCversion());
+		        }
+		        
+		        // Assert others
+		        if(ephemeralOwner == 0x8000000000000000L) assertEquals(1, dataTree.getContainers().size());
+		        //else if(ephemeralOwner == 0xff00000000000000L) assertEquals(1, dataTree.getTtls().size());
 	    	} catch (Exception e) {
 	    		System.out.println("error " + e.getClass().toString());
 	    		assertTrue(e.getClass().toString().contains(expectedOutput) && expectedOutput != "");
@@ -279,14 +328,10 @@ public class DataTreeTest {
 	    			this.nNodes--;
 	    		}
 		    	if(typeTest == 8) {
-		    		getParentString(path);
+		    		parentPath = getParentString(path);
 		    		dataTree.deleteNode(parentPath,zxid);
 	    			this.nNodes--;
 		    	}
-		    	
-	
-		        System.out.println(path);
-
 	    		dataTree.deleteNode(path,zxid);
 		        System.out.println("ok");
 
@@ -296,7 +341,7 @@ public class DataTreeTest {
 		        assertNull(createdNode);
 
 		        // Verify the zxid father node
-	    		getParentString(path);
+		        parentPath = getParentString(path);
 	    		DataNode parentNode = dataTree.getNode(parentPath);
                 long parentPxzid = parentNode.stat.getPzxid();
                 if(zxid > 0) id = zxid;
@@ -308,22 +353,21 @@ public class DataTreeTest {
 	    		assertTrue(e.getClass().toString().contains(expectedOutput) && expectedOutput != "");
 	    	}
 	    }	
-	    
-	    private void getParentString(String path){
-            String[] pathNodes = path.split("/");  
-            int n = pathNodes.length;
-	    	String p = "";
-            int count = 1;
-            for (String pathElement : pathNodes) {
-            	if (count == n) {
-                	if (count == 2) p = "/";
-                    break;
-                }
-                if(count != 1) p = p + "/";
-            	p = p + pathElement;
-                count++;
-            }
-            this.parentPath = p;
-	    }
 	}
+    static String getParentString(String path){
+        String[] pathNodes = path.split("/");  
+        int n = pathNodes.length;
+    	String p = "";
+        int count = 1;
+        for (String pathElement : pathNodes) {
+        	if (count == n) {
+            	if (count == 2) p = "/";
+                break;
+            }
+            if(count != 1) p = p + "/";
+        	p = p + pathElement;
+            count++;
+        }
+        return p;
+    }
 }
