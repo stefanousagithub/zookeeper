@@ -91,12 +91,12 @@ public class ZooKeeperTest {
 	    public void getChildrenTest() {
 	        List<String> children = null;
             try {
-	            System.out.println(zk.getChildWatches());
+	            System.out.println(zk.getDataWatches());
 				children = zk.getChildren(path, watcher);
-	            System.out.println(zk.getChildWatches());
 				assertEquals(Integer.parseInt(expectedOutput), children.size());
 				if(watcher != null) assertEquals(1, zk.getChildWatches().size());
 				else assertEquals(0, zk.getChildWatches().size());
+				System.out.println(zk.getClientConfig());
 
 			} catch (Exception e) {
 	    		System.out.println("error " + e.getClass().toString());
@@ -170,13 +170,13 @@ public class ZooKeeperTest {
 	    @Parameters
 	    public static Collection<Object[]> getParameters() {
 	        return Arrays.asList(new Object[][]{
-//	            {null, new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 1, "IllegalArgumentException"},
-//	            {"node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "IllegalArgumentException"},
-//	            {"/node1", null, WatcherType.Persistent, true, 1, "IllegalArgumentException"},
-//	            {"/node1", new ClientBase.CountdownWatcher(), null, false, 1, "NullPointerException"},
-//	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 3, "NoWatcherException"},			// No Watcher
-//	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 4, "NoWatcherException"},				// Watcher present but with different type
-//	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "0"}             // 
+	            {null, new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 1, "IllegalArgumentException"},
+	            {"node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "IllegalArgumentException"},
+	            {"/node1", null, WatcherType.Persistent, true, 1, "IllegalArgumentException"},
+	            {"/node1", new ClientBase.CountdownWatcher(), null, false, 1, "NullPointerException"},
+	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 3, "NoWatcherException"},			// No Watcher
+	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, true, 4, "NoWatcherException"},				// Watcher present but with different type
+	            {"/node1", new ClientBase.CountdownWatcher(), WatcherType.Persistent, false, 1, "0"}             // 
 	        });
 	    }	    
 	   	    
